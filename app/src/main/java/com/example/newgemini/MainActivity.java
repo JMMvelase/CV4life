@@ -2,6 +2,7 @@ package com.example.newgemini;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -27,14 +28,11 @@ import java.time.format.DateTimeFormatter;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private TextInputEditText queryEditText;
-
     private Button sendQueryButton;
-
     private ProgressBar progressBar;
-
     private LinearLayout chatBodyContainer;
-
     private ChatFutures chatModel;
 
     @Override
@@ -48,76 +46,69 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        chatModel =getChatModel();
-
+        chatModel = getChatModel();
         queryEditText = findViewById(R.id.queryEditText);
         sendQueryButton = findViewById(R.id.sendPromptButton);
         progressBar = findViewById(R.id.sendPromptProgressBar);
-        chatBodyContainer =findViewById(R.id.chatResponseLayout);
+        chatBodyContainer = findViewById(R.id.chatResponseLayout);
 
-        sendQueryButton.setOnClickListener(v->{
-
+        sendQueryButton.setOnClickListener(v -> {
             String query = queryEditText.getText().toString();
+            if(query.isEmpty()){
+                Toast.makeText(this, "Please enter a query", Toast.LENGTH_SHORT).show();
+                return;
+            }
             progressBar.setVisibility(View.VISIBLE);
-
             queryEditText.setText("");
-            populateChatBody("You",query,getDate());
+            populateChatBody("You", query, getDate());
+            Log.d(TAG, "Sending query: " + query);
 
             GeminiPro.getResponse(chatModel, query, new ResponseCallBack() {
                 @Override
-                public void onResponse(String response){
-
+                public void onResponse(String response) {
                     progressBar.setVisibility(View.GONE);
-                    populateChatBody("GeminiPro", response,getDate());
-
+                    Log.d(TAG, "Received response: " + response);
+                    populateChatBody("VIVI", response, getDate());
                 }
 
                 @Override
-                public void onError(Throwable throwable){
-                    Toast.makeText(MainActivity.this,"Error" + throwable.getMessage(),Toast.LENGTH_SHORT).show();
-                    populateChatBody("GeminiPro","Sorry i'm having trouble understanding that. Please try again",getDate());
+                public void onError(Throwable throwable) {
                     progressBar.setVisibility(View.GONE);
-
+                    Log.e(TAG, "Error in getResponse", throwable);
+                    Toast.makeText(MainActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    populateChatBody("VIVI", "Sorry I'm having trouble understanding that. Please try again.", getDate());
                 }
             });
         });
-
     }
 
-    private  ChatFutures getChatModel(){
+    private ChatFutures getChatModel() {
         GeminiPro model = new GeminiPro();
-        GenerativeModelFutures modelFutures =model.getModel();
-
+        GenerativeModelFutures modelFutures = model.getModel();
         return modelFutures.startChat();
     }
 
-    public void populateChatBody(String userName, String message,String date){
+    public void populateChatBody(String userName, String message, String date) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.chat_message_block, null);
 
         TextView userAgentName = view.findViewById(R.id.userAgentNameTextfield);
         TextView userAgentMessage = view.findViewById(R.id.userAgentMessageTextView);
-        TextView dataTextView = view.findViewById(R.id.dateTextView);
+        TextView dateTextView = view.findViewById(R.id.dateTextView);
 
         userAgentName.setText(userName);
         userAgentMessage.setText(message);
-        dataTextView.setText(date);
+        dateTextView.setText(date);
 
         chatBodyContainer.addView(view);
 
         ScrollView scrollView = findViewById(R.id.scrollView);
-        scrollView.post(()->scrollView.fullScroll(View.FOCUS_DOWN));
+        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
     }
 
-    private String getDate(){
-        Instant instant =Instant.now();
-        DateTimeFormatter formatter =DateTimeFormatter.ofPattern("yyyy-MM-dd:HH-mm").withZone(ZoneId.systemDefault());
-
+    private String getDate() {
+        Instant instant = Instant.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH-mm").withZone(ZoneId.systemDefault());
         return formatter.format(instant);
-
     }
 }
-
-
-
-

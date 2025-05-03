@@ -1,0 +1,49 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#4A00E0"
+                android:endColor="#8833FF"
+                android:angle="315" />
+            <size
+                android:width="48dp"
+                android:height="48dp" />
+        </shape>
+    </item>
+    <!-- Button face with angled gradient -->
+    <item
+        android:bottom="2dp"
+        android:left="1dp"
+        android:right="2dp"
+        android:top="1dp">
+        <rotate
+            android:fromDegrees="315"
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:toDegrees="315">
+            <shape android:shape="oval">
+                <gradient
+                    android:type="linear"
+                    android:startColor="#8E2DE2"
+                    android:centerColor="#7028E4"
+                    android:endColor="#5423E4"
+                    android:angle="135" />
+            </shape>
+        </rotate>
+    </item>
+    <!-- Shine effect -->
+    <item
+        android:bottom="24dp"
+        android:left="8dp"
+        android:right="24dp"
+        android:top="8dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="linear"
+                android:startColor="#80FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="45" />
+        </shape>
+    </item>
+</layer-list>
