@@ -26,7 +26,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class MainActivity extends AppCompatActivity {
+public class viviActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private TextInputEditText queryEditText;
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_vivi);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onError(Throwable throwable) {
                     progressBar.setVisibility(View.GONE);
                     Log.e(TAG, "Error in getResponse", throwable);
-                    Toast.makeText(MainActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(viviActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     populateChatBody("VIVI", "Sorry I'm having trouble understanding that. Please try again.", getDate());
                 }
             });
