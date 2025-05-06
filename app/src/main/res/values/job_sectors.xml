@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="job_sectors">
+        <item>Information Technology</item>
+        <item>Engineering</item>
+        <item>Healthcare</item>
+        <item>Finance</item>
+        <item>Education</item>
+        <item>Marketing</item>
+        <item>Sales</item>
+        <item>Human Resources</item>
+        <item>Manufacturing</item>
+        <item>Construction</item>
+        <item>Retail</item>
+        <item>Hospitality</item>
+        <item>Media and Communication</item>
+        <item>Legal Services</item>
+        <item>Research and Development</item>
+        <item>Other</item>
+    </string-array>
+</resources>

@@ -17,4 +17,9 @@
     <color name="colorSecondary">#03DAC5</color>
     <color name="colorSecondaryDark">#018786</color>
     <color name="colorOnSecondary">#000000</color>
+    <color name="primaryColor">#4CAF50</color>
+    <color name="primaryColorDark">#388E3C</color>
+    <color name="primaryColorLight">#C8E6C9</color>
+    <color name="accentColor">#8BC34A</color>
+    <color name="grayLight">#EEEEEE</color>
 </resources>

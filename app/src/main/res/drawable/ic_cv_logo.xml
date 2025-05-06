@@ -1,0 +1,28 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Background -->
+    <path
+        android:fillColor="@color/message_bg"
+        android:pathData="M3,3h18v18h-18z"/>
+    <!-- Document -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M14,2H6C4.9,2 4,2.9 4,4v16c0,1.1 0.9,2 2,2h12c1.1,0 2,-0.9 2,-2V8L14,2z"/>
+    <!-- Fold -->
+    <path
+        android:fillColor="@color/accent"
+        android:pathData="M13,9V3.5L18.5,9H13z"/>
+    <!-- Lines -->
+    <path
+        android:fillColor="@color/primary_text"
+        android:pathData="M8,14h8v1h-8z"/>
+    <path
+        android:fillColor="@color/primary_text"
+        android:pathData="M8,16h8v1h-8z"/>
+    <path
+        android:fillColor="@color/primary_text"
+        android:pathData="M8,12h4v1h-4z"/>
+</vector>
