@@ -1,6 +1,7 @@
 package com.example.newgemini;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -44,7 +45,12 @@ public class StudentDashboardActivity extends AppCompatActivity {
     }
 
     private void editProfile() {
-        // Navigate to profile editing
-        // Implementation will be needed
+        // Create an Intent to navigate to a new ProfileActivity
+        Intent intent = new Intent(this, ProfileActivity.class);
+
+        // You can pass the current student's ID or data if needed
+        // intent.putExtra("studentId", currentStudentId);
+
+        startActivity(intent);
     }
 }

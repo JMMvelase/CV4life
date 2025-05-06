@@ -1,6 +1,7 @@
-package com.example.studentcv;
+package com.example.newgemini;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;

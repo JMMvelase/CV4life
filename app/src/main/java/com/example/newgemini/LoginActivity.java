@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ImageView;
@@ -14,13 +13,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText emailInput, passwordInput;
+    private TextInputEditText emailInput, passwordInput;
     private Button loginButton, registerButton;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
@@ -32,14 +32,19 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_login);
 
+        // Initialize Firebase instances
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
         // Initialize views
+        initializeViews();
+        setupClickListeners();
+    }
+
+    private void initializeViews() {
         emailInput = findViewById(R.id.email);
         passwordInput = findViewById(R.id.password);
         loginButton = findViewById(R.id.loginBtn);
@@ -48,24 +53,38 @@ public class LoginActivity extends AppCompatActivity {
         loginCard = findViewById(R.id.loginCard);
         logoImage = findViewById(R.id.logoImage);
         welcomeText = findViewById(R.id.welcomeText);
+    }
 
-        // Set up click listeners
+    private void setupClickListeners() {
         loginButton.setOnClickListener(v -> loginUser());
-        registerButton.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
+        registerButton.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
     }
 
     private void loginUser() {
         String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(email)) {
+            emailInput.setError("Email is required");
+            return;
+        }
+
+        if (TextUtils.isEmpty(password)) {
+            passwordInput.setError("Password is required");
             return;
         }
 
         progressBar.setVisibility(View.VISIBLE);
+        loginButton.setEnabled(false);
+
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             progressBar.setVisibility(View.GONE);
+            loginButton.setEnabled(true);
+
             if (task.isSuccessful()) {
                 String userId = auth.getCurrentUser().getUid();
                 firestore.collection("users").document(userId).get()

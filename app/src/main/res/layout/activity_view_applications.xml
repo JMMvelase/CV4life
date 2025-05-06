@@ -1,44 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/message_bg"
-    android:orientation="vertical">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        app:title="Applications"
-        app:titleTextColor="@color/primary_text"/>
+    android:background="@color/message_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filter by Sector"
-            android:textColor="@color/secondary_text"/>
 
         <Spinner
             android:id="@+id/sectorFilterSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/spinner_background"/>
+            android:layout_margin="16dp"
+            android:background="@drawable/spinner_background" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/applicationsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="8dp" />
+
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/applicationsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        android:clipToPadding="false"/>
-
-</LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

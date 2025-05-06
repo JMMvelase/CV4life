@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">NewGemini</string>
+    <string name="app_name">CV4LIFE</string>
+    <string name="applied_date">Applied: %s</string>
+    <string name="application_update">Application Update</string>
+    <string name="application_accepted">Congratulations! Your application for %s has been accepted!</string>
+    <string name="application_rejected">Thank you for your interest. Unfortunately, your application for %s was not successful.</string>
+    <string name="application_shortlisted">Great news! You\'ve been shortlisted for %s. We\'ll contact you soon for the next steps.</string>
+    <string name="application_status_updated">Your application status for %s has been updated.</string>
 </resources>

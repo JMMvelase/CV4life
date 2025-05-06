@@ -1,15 +1,16 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.googleGmsGoogleServices)
 }
 
 android {
     namespace = "com.example.newgemini"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.newgemini"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -38,9 +39,18 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.swiperefreshlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation ("androidx.recyclerview:recyclerview:1.2.1")
+    implementation ("com.google.firebase:firebase-firestore:24.1.0")
+    implementation ("com.google.firebase:firebase-auth:21.0.3")
+    implementation ("com.google.android.gms:play-services-safetynet:18.0.1")
 
     implementation("com.google.ai.client.generativeai:generativeai:0.3.0")
     implementation("com.google.guava:guava:31.0.1-android")
