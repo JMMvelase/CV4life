@@ -1,15 +1,13 @@
 package com.example.newgemini;
 
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,11 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
+
     private FirebaseFirestore firestore;
-    private EditText nameInput;
-    private EditText emailInput;
-    private EditText phoneInput;
-    private EditText departmentInput;
+    private EditText nameInput, emailInput, phoneInput;
+    private Spinner departmentSpinner;
     private Button saveButton;
 
     @Override
@@ -47,28 +44,33 @@ public class ProfileActivity extends AppCompatActivity {
         nameInput = findViewById(R.id.nameInput);
         emailInput = findViewById(R.id.emailInput);
         phoneInput = findViewById(R.id.phoneInput);
-        departmentInput = findViewById(R.id.departmentInput);
+        departmentSpinner = findViewById(R.id.departmentSpinner);
         saveButton = findViewById(R.id.saveButton);
+
+        // Set up the spinner with job sectors
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.job_sectors, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        departmentSpinner.setAdapter(adapter);
     }
 
     private void loadProfileData() {
-        // Get current user ID
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Fetch profile data from Firestore
         firestore.collection("students")
                 .document(userId)
                 .get()
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {
-                        // Convert document to StudentProfile object
-                        StudentProfile profile = document.toObject(StudentProfile.class);
-                        if (profile != null) {
-                            // Populate the UI with existing data
-                            nameInput.setText(profile.getName());
-                            emailInput.setText(profile.getEmail());
-                            phoneInput.setText(profile.getPhone());
-                            departmentInput.setText(profile.getDepartment());
+                        nameInput.setText(document.getString("name"));
+                        emailInput.setText(document.getString("email"));
+                        phoneInput.setText(document.getString("phone"));
+
+                        String department = document.getString("department");
+                        if (department != null) {
+                            int spinnerPosition = ((ArrayAdapter) departmentSpinner.getAdapter())
+                                    .getPosition(department);
+                            departmentSpinner.setSelection(spinnerPosition);
                         }
                     }
                 })
@@ -79,24 +81,19 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void saveProfile() {
-        // Get current user ID
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Create StudentProfile object
-        StudentProfile profile = new StudentProfile(
-                nameInput.getText().toString().trim(),
-                emailInput.getText().toString().trim(),
-                phoneInput.getText().toString().trim(),
-                departmentInput.getText().toString().trim()
-        );
+        Map<String, Object> profile = new HashMap<>();
+        profile.put("name", nameInput.getText().toString().trim());
+        profile.put("email", emailInput.getText().toString().trim());
+        profile.put("phone", phoneInput.getText().toString().trim());
+        profile.put("department", departmentSpinner.getSelectedItem().toString());
 
-        // Save to Firestore
         firestore.collection("students")
                 .document(userId)
                 .set(profile)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Profile updated successfully",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {

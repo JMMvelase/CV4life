@@ -1,5 +1,7 @@
 package com.example.newgemini;
 
+import static com.example.newgemini.R.id.applicationsRecyclerView;
+
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -10,12 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewApplicationsActivity extends AppCompatActivity {
+public class StudentApplicationsActivity extends AppCompatActivity {
 
     private FirebaseFirestore firestore;
     private FirebaseAuth auth;
@@ -25,7 +26,7 @@ public class ViewApplicationsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_applications);
+        setContentView(R.layout.activity_student_applications);
 
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -34,7 +35,7 @@ public class ViewApplicationsActivity extends AppCompatActivity {
         applicationsRecyclerView = findViewById(R.id.applicationsRecyclerView);
         applicationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new ApplicationsAdapter(this, true); // true for recruiter view
+        adapter = new ApplicationsAdapter(this, false); // false for student view
         applicationsRecyclerView.setAdapter(adapter);
 
         // Load applications
@@ -42,9 +43,9 @@ public class ViewApplicationsActivity extends AppCompatActivity {
     }
 
     private void loadApplications() {
-        String recruiterId = auth.getCurrentUser().getUid();
+        String studentId = auth.getCurrentUser().getUid();
         firestore.collection("applications")
-                .whereEqualTo("recruiterId", recruiterId)
+                .whereEqualTo("studentId", studentId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<JobApplication> applications = new ArrayList<>();

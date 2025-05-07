@@ -89,7 +89,7 @@
                 android:paddingTop="12dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="12dp"
-                android:textColorHint="@color/hint_text"
+                android:textColorHint="@color/white"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 

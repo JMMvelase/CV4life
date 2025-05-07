@@ -1,0 +1,47 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/jobsToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:titleTextColor="@android:color/white" />
+
+        <!-- Spinner for filtering job sectors -->
+        <Spinner
+            android:id="@+id/jobFilterSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:spinnerMode="dropdown" />
+
+        <!-- TextView for when no jobs are available -->
+        <TextView
+            android:id="@+id/noJobsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="No jobs available"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <!-- RecyclerView for displaying jobs -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/jobsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp" />
+
+    </LinearLayout>
+</ScrollView>

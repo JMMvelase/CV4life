@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 
 public class viviActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "viviActivity";
     private TextInputEditText queryEditText;
     private Button sendQueryButton;
     private ProgressBar progressBar;

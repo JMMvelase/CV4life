@@ -1,24 +1,47 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.NewGemini" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <!-- Global application theme -->
+    <style name="Theme.NewGemini" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary and secondary colors -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
         <item name="colorOnPrimary">@color/primary_text</item>
-        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/accent</item>
         <item name="colorSecondaryVariant">@color/colorSecondary</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
-        <!-- Status bar color. -->
+
+        <!-- Status bar color -->
         <item name="android:statusBarColor">@color/message_bg</item>
+
         <!-- Background colors -->
         <item name="android:windowBackground">@color/message_bg</item>
+
         <!-- Text colors -->
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:textColorHint">@color/hint_text</item>
     </style>
 
-    <style name="Theme.NewGemini" parent="Base.Theme.NewGemini" />
+    <!-- Custom theme for JobsActivity -->
+    <style name="Theme.NewGemini.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Use the same colors as the base theme -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorOnPrimary">@color/primary_text</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/colorSecondary</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/message_bg</item>
+
+        <!-- Background colors -->
+        <item name="android:windowBackground">@color/message_bg</item>
+
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:textColorHint">@color/hint_text</item>
+    </style>
+
 </resources>

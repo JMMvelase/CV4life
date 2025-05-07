@@ -16,6 +16,17 @@
         android:theme="@style/Theme.NewGemini"
         tools:targetApi="31">
         <activity
+            android:name=".StudentApplicationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ApplyJobActivity"
+            android:exported="false" />
+
+        <!-- JobsActivity uses the custom NoActionBar theme -->
+        <activity
+            android:name=".JobsActivity"
+            android:theme="@style/Theme.NewGemini.NoActionBar" />
+        <activity
             android:name=".ApplicationsActivity"
             android:exported="false" />
         <activity

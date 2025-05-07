@@ -1,0 +1,47 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Cover Letter Input -->
+    <EditText
+        android:id="@+id/coverLetterEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your cover letter"
+        android:inputType="textMultiLine"
+        android:lines="5"
+        android:gravity="top"
+        android:padding="8dp"
+        android:background="@drawable/edit_text_background" />
+
+    <!-- CV Preview -->
+    <ImageView
+        android:id="@+id/cvImageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:background="@color/white" />
+
+    <!-- Upload CV Button -->
+    <Button
+        android:id="@+id/uploadCvButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Upload CV" />
+
+    <!-- Submit Application Button -->
+    <Button
+        android:id="@+id/submitApplicationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/primaryColor"
+        android:textColor="@android:color/white"
+        android:text="Submit Application" />
+
+</LinearLayout>

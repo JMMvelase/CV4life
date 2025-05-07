@@ -26,6 +26,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         CardView myApplicationsCard = findViewById(R.id.myApplicationsCard);
         CardView editCVCard = findViewById(R.id.editCVCard);
         CardView profileCard = findViewById(R.id.profileCard);
+        CardView chatbotCard = findViewById(R.id.chatbotCard);
         CardView settingsCard = findViewById(R.id.settingsCard);
         Button logoutButton = findViewById(R.id.logoutButton);
 
@@ -35,6 +36,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         editCVCard.setOnClickListener(v -> editCV());
         profileCard.setOnClickListener(v -> editProfile());
         settingsCard.setOnClickListener(v -> openSettings());
+        chatbotCard.setOnClickListener(v -> openChatbot());
         logoutButton.setOnClickListener(v -> logout());
     }
 
@@ -58,6 +60,11 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
     private void editProfile() {
         Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
+    }
+    private void openChatbot() {
+        // Navigate to Chatbot activity
+        Intent intent = new Intent(this, viviActivity.class);
         startActivity(intent);
     }
 
