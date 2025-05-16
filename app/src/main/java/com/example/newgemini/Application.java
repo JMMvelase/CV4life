@@ -5,6 +5,7 @@ import java.util.Date;
 public class Application {
     private String id;
     private String jobId;
+    private String title; // Job title field
     private String recruiterId;
     private String studentId;
     private String status;
@@ -27,6 +28,14 @@ public class Application {
 
     public void setJobId(String jobId) {
         this.jobId = jobId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getRecruiterId() {
