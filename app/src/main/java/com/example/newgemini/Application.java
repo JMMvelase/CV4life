@@ -5,15 +5,20 @@ import java.util.Date;
 public class Application {
     private String id;
     private String jobId;
-    private String title; // Job title field
+    private String title;
     private String recruiterId;
     private String studentId;
     private String status;
     private Date createdAt;
 
+    // These fields might exist in Firestore but are not needed in the app
+    private transient String cvBase64;
+    private transient String coverLetter;
+
     // Default constructor required for Firestore
     public Application() {}
 
+    // Getters and setters for all fields
     public String getId() {
         return id;
     }

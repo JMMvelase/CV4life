@@ -52,19 +52,42 @@ public class StudentApplicationsActivity extends AppCompatActivity {
                 .whereEqualTo("studentId", studentId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Application> applications = new ArrayList<>();
+                    applicationList.clear();
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Application application = doc.toObject(Application.class);
                         if (application != null) {
                             application.setId(doc.getId()); // Set Firestore document ID
-                            applications.add(application);
+                            Log.d("ApplicationsDebug", "Application fetched: " + application.getId());
+
+                            // Fetch the job title using recruiterId if jobId is null
+                            String recruiterId = application.getRecruiterId();
+                            Log.d("ApplicationsDebug", "Fetching job title for recruiterId: " + recruiterId);
+                            if (application.getJobId() == null && recruiterId != null) {
+                                firestore.collection("jobs")
+                                        .whereEqualTo("recruiterId", recruiterId)
+                                        .limit(1)
+                                        .get()
+                                        .addOnSuccessListener(jobSnapshot -> {
+                                            if (!jobSnapshot.isEmpty()) {
+                                                DocumentSnapshot jobDoc = jobSnapshot.getDocuments().get(0);
+                                                String jobTitle = jobDoc.getString("title");
+                                                Log.d("ApplicationsDebug", "Job title fetched: " + jobTitle);
+                                                application.setTitle(jobTitle);
+                                                adapter.notifyDataSetChanged();
+                                            } else {
+                                                Log.e("ApplicationsDebug", "No job document found for recruiterId: " + recruiterId);
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> Log.e("ApplicationsDebug", "Failed to fetch job title: " + e.getMessage()));
+                            }
+                            applicationList.add(application);
                         }
                     }
-                    adapter.updateApplications(applications); // Update the adapter with the converted data
+                    adapter.notifyDataSetChanged(); // Refresh adapter after adding all applications
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error loading applications: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("StudentApplications", "Error loading applications: " + e.getMessage());
+                    Log.e("ApplicationsDebug", "Error loading applications: " + e.getMessage());
                 });
     }
 }

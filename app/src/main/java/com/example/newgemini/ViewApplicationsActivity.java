@@ -18,7 +18,7 @@ import java.util.List;
 public class ViewApplicationsActivity extends AppCompatActivity implements ApplicationsAdapter.OnApplicationActionListener {
 
     private RecyclerView applicationsRecyclerView;
-    private ApplicationsAdapter applicationsAdapter;
+    private ApplicationsAdapter adapter;
     private List<Application> applicationList;
     private FirebaseFirestore firestore;
     private FirebaseAuth auth;
@@ -28,19 +28,18 @@ public class ViewApplicationsActivity extends AppCompatActivity implements Appli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_applications);
 
-        // Initialize Firebase Firestore and Auth
+        // Initialize Firestore and FirebaseAuth
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Set up RecyclerView
+        // Initialize RecyclerView
         applicationsRecyclerView = findViewById(R.id.applicationsRecyclerView);
         applicationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize Adapter
         applicationList = new ArrayList<>();
-        boolean isRecruiter = true; // Modify this to determine recruiter dynamically, if needed
-        applicationsAdapter = new ApplicationsAdapter(this, applicationList, isRecruiter, this);
-        applicationsRecyclerView.setAdapter(applicationsAdapter);
+        adapter = new ApplicationsAdapter(this, applicationList, true, this); // Pass true for isRecruiter
+        applicationsRecyclerView.setAdapter(adapter);
 
         // Load applications
         loadApplications();
@@ -58,15 +57,31 @@ public class ViewApplicationsActivity extends AppCompatActivity implements Appli
                         Application application = doc.toObject(Application.class);
                         if (application != null) {
                             application.setId(doc.getId()); // Set Firestore document ID
+
+                            // Fetch the job title using recruiterId if jobId is null
+                            if (application.getJobId() == null) {
+                                firestore.collection("jobs")
+                                        .whereEqualTo("recruiterId", recruiterId)
+                                        .limit(1)
+                                        .get()
+                                        .addOnSuccessListener(jobSnapshot -> {
+                                            if (!jobSnapshot.isEmpty()) {
+                                                DocumentSnapshot jobDoc = jobSnapshot.getDocuments().get(0);
+                                                String jobTitle = jobDoc.getString("title");
+                                                application.setTitle(jobTitle);
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> Log.e("ViewApplications", "Failed to fetch job title: " + e.getMessage()));
+                            }
                             applicationList.add(application);
-                            Log.d("ViewApplicationsActivity", "Fetched application ID: " + application.getId());
                         }
                     }
-                    applicationsAdapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged(); // Refresh adapter after adding all applications
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error loading applications: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("ViewApplicationsActivity", "Error loading applications: " + e.getMessage());
+                    Log.e("ViewApplications", "Error loading applications: " + e.getMessage());
                 });
     }
 
@@ -92,13 +107,11 @@ public class ViewApplicationsActivity extends AppCompatActivity implements Appli
                 .update("status", status)
                 .addOnSuccessListener(aVoid -> {
                     application.setStatus(status);
-                    applicationsAdapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
                     Toast.makeText(this, "Application status updated to " + status, Toast.LENGTH_SHORT).show();
-                    Log.i("ViewApplicationsActivity", "Application successfully updated.");
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to update application: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("ViewApplicationsActivity", "Failed to update application: " + e.getMessage());
                 });
     }
 }
