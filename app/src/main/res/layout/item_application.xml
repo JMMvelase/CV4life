@@ -3,94 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
-    android:background="@drawable/card_background"
-    android:layout_marginBottom="8dp">
+    android:padding="8dp">
 
-    <!-- Job Title -->
     <TextView
-        android:id="@+id/jobTitleText"
-        android:layout_width="match_parent"
+        android:id="@+id/jobTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Job Title"
-        android:textStyle="bold"
         android:textSize="16sp"
-        android:paddingBottom="4dp" />
+        android:textStyle="bold" />
 
-    <!-- Company Name -->
     <TextView
-        android:id="@+id/companyNameText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Company Name"
-        android:textSize="14sp"
-        android:paddingBottom="4dp" />
-
-    <!-- Student Name (Visible to Recruiters Only) -->
-    <TextView
-        android:id="@+id/studentNameText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Student Name"
-        android:textSize="14sp"
-        android:paddingBottom="4dp"
-        android:visibility="gone" />
-
-    <!-- Date Applied -->
-    <TextView
-        android:id="@+id/dateAppliedText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Applied on: YYYY-MM-DD"
-        android:textSize="12sp"
-        android:paddingBottom="4dp" />
-
-    <!-- Application Status -->
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="match_parent"
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Status: Pending"
-        android:textStyle="italic"
         android:textSize="14sp"
-        android:paddingBottom="8dp" />
+        android:paddingTop="4dp" />
 
-    <!-- Buttons for Recruiter Actions (Visible to Recruiters Only) -->
     <LinearLayout
-        android:id="@+id/responseButtons"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:paddingTop="8dp">
 
-        <!-- Accept Button -->
         <Button
             android:id="@+id/acceptButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/primaryColor"
-            android:textColor="@android:color/white"
             android:text="Accept" />
 
-        <!-- Reject Button -->
         <Button
             android:id="@+id/rejectButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"
-            android:text="Reject" />
-
-        <!-- Shortlist Button -->
-        <Button
-            android:id="@+id/shortlistButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/accent"
-            android:textColor="@android:color/white"
-            android:text="Shortlist" />
+            android:text="Reject"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 </LinearLayout>

@@ -37,7 +37,6 @@
             android:textSize="12sp"
             android:textColor="@android:color/darker_gray" />
 
-        <!-- Apply Button -->
         <Button
             android:id="@+id/jobApplyButton"
             android:layout_width="wrap_content"

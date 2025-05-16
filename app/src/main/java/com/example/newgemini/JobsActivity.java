@@ -1,70 +1,64 @@
 package com.example.newgemini;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class JobsActivity extends AppCompatActivity {
+public class JobsActivity extends AppCompatActivity implements JobsAdapter.ApplyJobCallback {
 
     private FirebaseFirestore firestore;
     private RecyclerView jobsRecyclerView;
     private JobsAdapter jobsAdapter;
     private List<Job> jobList;
     private Spinner jobFilterSpinner;
-    private TextView noJobsTextView; // TextView to display when no jobs are available
+    private TextView noJobsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jobs);
 
-        // Set up the custom Toolbar
         Toolbar toolbar = findViewById(R.id.jobsToolbar);
-        setSupportActionBar(toolbar); // Set the custom Toolbar as the ActionBar
-        getSupportActionBar().setTitle("Jobs Available"); // Set the title
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Enable back button
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Jobs Available");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Initialize Firestore
         firestore = FirebaseFirestore.getInstance();
 
-        // Initialize UI Components
         jobFilterSpinner = findViewById(R.id.jobFilterSpinner);
         jobsRecyclerView = findViewById(R.id.jobsRecyclerView);
-        noJobsTextView = findViewById(R.id.noJobsTextView); // Initialize the no-jobs TextView
+        noJobsTextView = findViewById(R.id.noJobsTextView);
         jobsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         jobList = new ArrayList<>();
-        jobsAdapter = new JobsAdapter(jobList, this);
+        jobsAdapter = new JobsAdapter(jobList, this, this);
         jobsRecyclerView.setAdapter(jobsAdapter);
 
-        // Set up Spinner for Job Sector Filtering
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
                 this, R.array.job_sectors, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         jobFilterSpinner.setAdapter(spinnerAdapter);
 
-        // Spinner item selection listener
         jobFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedSector = parent.getItemAtPosition(position).toString();
 
-                // Avoid filtering if "All" is selected
                 if ("All".equalsIgnoreCase(selectedSector)) {
                     fetchAllJobsFromFirestore();
                 } else {
@@ -74,17 +68,13 @@ public class JobsActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                fetchAllJobsFromFirestore(); // Default to fetching all jobs if nothing is selected
+                fetchAllJobsFromFirestore();
             }
         });
 
-        // Fetch all jobs initially
         fetchAllJobsFromFirestore();
     }
 
-    /**
-     * Fetch all jobs without filtering.
-     */
     private void fetchAllJobsFromFirestore() {
         firestore.collection("jobs")
                 .get()
@@ -93,18 +83,14 @@ public class JobsActivity extends AppCompatActivity {
                         jobList.clear();
                         jobList.addAll(queryDocumentSnapshots.toObjects(Job.class));
                         jobsAdapter.notifyDataSetChanged();
-                        toggleRecyclerViewVisibility(true); // Show the RecyclerView
+                        toggleRecyclerViewVisibility(true);
                     } else {
-                        toggleRecyclerViewVisibility(false); // Hide the RecyclerView
+                        toggleRecyclerViewVisibility(false);
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Error fetching jobs: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    /**
-     * Fetch jobs filtered by the selected sector.
-     * @param sectorFilter The sector to filter jobs by.
-     */
     private void fetchJobsFromFirestore(String sectorFilter) {
         firestore.collection("jobs")
                 .whereEqualTo("sector", sectorFilter)
@@ -114,18 +100,14 @@ public class JobsActivity extends AppCompatActivity {
                         jobList.clear();
                         jobList.addAll(queryDocumentSnapshots.toObjects(Job.class));
                         jobsAdapter.notifyDataSetChanged();
-                        toggleRecyclerViewVisibility(true); // Show the RecyclerView
+                        toggleRecyclerViewVisibility(true);
                     } else {
-                        toggleRecyclerViewVisibility(false); // Hide the RecyclerView
+                        toggleRecyclerViewVisibility(false);
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Error fetching jobs: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    /**
-     * Toggles the visibility of the RecyclerView and the no-jobs TextView.
-     * @param showRecyclerView True to show the RecyclerView, false to hide it and show the TextView.
-     */
     private void toggleRecyclerViewVisibility(boolean showRecyclerView) {
         if (showRecyclerView) {
             jobsRecyclerView.setVisibility(View.VISIBLE);
@@ -134,5 +116,13 @@ public class JobsActivity extends AppCompatActivity {
             jobsRecyclerView.setVisibility(View.GONE);
             noJobsTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onApply(String jobId, String recruiterId) {
+        Intent intent = new Intent(this, ApplyJobActivity.class);
+        intent.putExtra("jobId", jobId);
+        intent.putExtra("recruiterId", recruiterId);
+        startActivity(intent);
     }
 }

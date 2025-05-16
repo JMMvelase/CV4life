@@ -37,6 +37,18 @@ public class RecruiterDashboardActivity extends AppCompatActivity {
         postJobCard.setOnClickListener(v -> showJobPostDialog());
         viewApplicationsCard.setOnClickListener(v -> viewApplications());
         profileCard.setOnClickListener(v -> editProfile());
+
+        Button btnLogout = findViewById(R.id.btnLogout);
+
+        // Set Logout Button Click Listener
+        btnLogout.setOnClickListener(v -> {
+            auth.signOut(); // Log the user out
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish(); // Close the activity
+        });
+
     }
 
     private void showJobPostDialog() {
@@ -59,6 +71,8 @@ public class RecruiterDashboardActivity extends AppCompatActivity {
                 R.array.job_sectors, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sectorSpinner.setAdapter(adapter);
+
+
 
         postButton.setOnClickListener(v -> {
             String title = titleInput.getText().toString().trim();

@@ -1,8 +1,7 @@
 package com.example.newgemini;
 
-import static com.example.newgemini.R.id.applicationsRecyclerView;
-
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,16 +17,18 @@ import java.util.List;
 
 public class StudentApplicationsActivity extends AppCompatActivity {
 
-    private FirebaseFirestore firestore;
-    private FirebaseAuth auth;
     private RecyclerView applicationsRecyclerView;
     private ApplicationsAdapter adapter;
+    private List<Application> applicationList;
+    private FirebaseFirestore firestore;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_applications);
 
+        // Initialize Firestore and FirebaseAuth
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
@@ -35,7 +36,9 @@ public class StudentApplicationsActivity extends AppCompatActivity {
         applicationsRecyclerView = findViewById(R.id.applicationsRecyclerView);
         applicationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new ApplicationsAdapter(this, false); // false for student view
+        // Initialize Adapter
+        applicationList = new ArrayList<>();
+        adapter = new ApplicationsAdapter(this, applicationList, false, null); // Pass false for isRecruiter and null for the action listener
         applicationsRecyclerView.setAdapter(adapter);
 
         // Load applications
@@ -44,20 +47,24 @@ public class StudentApplicationsActivity extends AppCompatActivity {
 
     private void loadApplications() {
         String studentId = auth.getCurrentUser().getUid();
+
         firestore.collection("applications")
                 .whereEqualTo("studentId", studentId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<JobApplication> applications = new ArrayList<>();
+                    List<Application> applications = new ArrayList<>();
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        JobApplication application = doc.toObject(JobApplication.class);
+                        Application application = doc.toObject(Application.class);
                         if (application != null) {
-                            application.setApplicationId(doc.getId());
+                            application.setId(doc.getId()); // Set Firestore document ID
                             applications.add(application);
                         }
                     }
-                    adapter.updateApplications(applications);
+                    adapter.updateApplications(applications); // Update the adapter with the converted data
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Error loading applications: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error loading applications: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("StudentApplications", "Error loading applications: " + e.getMessage());
+                });
     }
 }

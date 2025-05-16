@@ -15,6 +15,7 @@ public class JobApplication {
     private String jobSector;
     private Date appliedAt;
     private Date updatedAt;
+    private Date createdAt;
     private String studentCV;
 
     // Default constructor required for Firestore
@@ -56,4 +57,6 @@ public class JobApplication {
 
     public String getStudentCV() { return studentCV; }
     public void setStudentCV(String studentCV) { this.studentCV = studentCV; }
+    public Date getCreatedAt() { return createdAt; } // Getter for createdAt
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; } // Setter for createdAt
 }

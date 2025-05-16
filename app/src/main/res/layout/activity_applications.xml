@@ -1,10 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ApplicationsActivity">
+    android:orientation="vertical"
+    android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- TextView for when no applications are found -->
+    <TextView
+        android:id="@+id/noApplicationsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No applications found"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:textColor="@android:color/darker_gray" />
+
+    <!-- RecyclerView for displaying applications -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/applicationsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:scrollbars="vertical" />
+</LinearLayout>

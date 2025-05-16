@@ -16,13 +16,13 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.JobViewHolder>
 
     private final List<Job> jobList;
     private final Context context;
-    private ApplyJobCallback applyJobCallback;
+    private final ApplyJobCallback applyJobCallback;
 
     public interface ApplyJobCallback {
         void onApply(String jobId, String recruiterId);
     }
 
-    public JobsAdapter(List<Job> jobList, Context context) {
+    public JobsAdapter(List<Job> jobList, Context context, ApplyJobCallback applyJobCallback) {
         this.jobList = jobList;
         this.context = context;
         this.applyJobCallback = applyJobCallback;

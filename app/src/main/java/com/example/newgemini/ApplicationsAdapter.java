@@ -10,136 +10,50 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapter.ApplicationViewHolder> {
-    private final List<JobApplication> applications;
-    private final Context context;
-    private final boolean isRecruiter;
-    private final FirebaseFirestore firestore;
 
-    public ApplicationsAdapter(Context context, boolean isRecruiter) {
+    private final Context context;
+    private final List<Application> applications;
+    private final boolean isRecruiter;
+    private final OnApplicationActionListener actionListener;
+
+    public ApplicationsAdapter(Context context, List<Application> applications, boolean isRecruiter, OnApplicationActionListener actionListener) {
         this.context = context;
-        this.applications = new ArrayList<>();
+        this.applications = applications;
         this.isRecruiter = isRecruiter;
-        this.firestore = FirebaseFirestore.getInstance();
+        this.actionListener = actionListener;
     }
 
     @NonNull
     @Override
     public ApplicationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(
-                com.example.newgemini.R.layout.item_application,
-                parent,
-                false
-        );
+        View view = LayoutInflater.from(context).inflate(R.layout.item_application, parent, false);
         return new ApplicationViewHolder(view);
     }
 
+    public void updateApplications(List<Application> newApplications) {
+        applications.clear(); // Clear the existing dataset
+        applications.addAll(newApplications); // Add the new dataset
+        notifyDataSetChanged(); // Notify the adapter to refresh the UI
+    }
     @Override
     public void onBindViewHolder(@NonNull ApplicationViewHolder holder, int position) {
-        JobApplication application = applications.get(position);
+        Application application = applications.get(position);
 
-        holder.jobTitleText.setText(application.getJobTitle());
-        holder.companyNameText.setText(application.getCompanyName());
-        holder.statusText.setText(application.getStatus());
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String dateApplied = sdf.format(application.getAppliedAt());
-        holder.dateAppliedText.setText(context.getString(com.example.newgemini.R.string.applied_date, dateApplied));
+        holder.jobTitle.setText(application.getJobId()); // Replace with a proper Job Title if available
+        holder.status.setText(application.getStatus());
 
         if (isRecruiter) {
-            holder.responseButtons.setVisibility(View.VISIBLE);
-            holder.studentNameText.setVisibility(View.VISIBLE);
-            holder.studentNameText.setText(application.getStudentName());
-            setupResponseButtons(holder, application);
+            holder.acceptButton.setVisibility(View.VISIBLE);
+            holder.rejectButton.setVisibility(View.VISIBLE);
+
+            holder.acceptButton.setOnClickListener(v -> actionListener.onAccept(application));
+            holder.rejectButton.setOnClickListener(v -> actionListener.onReject(application));
         } else {
-            holder.responseButtons.setVisibility(View.GONE);
-            holder.studentNameText.setVisibility(View.GONE);
-        }
-
-        // Set status color
-        int statusColor;
-        switch (application.getStatus().toLowerCase()) {
-            case "accepted":
-                statusColor = context.getColor(com.example.newgemini.R.color.primaryColor);
-                break;
-            case "rejected":
-                statusColor = context.getColor(com.example.newgemini.R.color.colorPrimaryDark);
-                break;
-            default:
-                statusColor = context.getColor(com.example.newgemini.R.color.accent);
-                break;
-        }
-        holder.statusText.setTextColor(statusColor);
-    }
-
-    private void setupResponseButtons(ApplicationViewHolder holder, JobApplication application) {
-        if (!"pending".equalsIgnoreCase(application.getStatus())) {
-            holder.responseButtons.setVisibility(View.GONE);
-            return;
-        }
-
-        holder.acceptButton.setOnClickListener(v -> {
-            updateApplicationStatus(application, "accepted");
-            sendNotification(application, "accepted");
-        });
-
-        holder.rejectButton.setOnClickListener(v -> {
-            updateApplicationStatus(application, "rejected");
-            sendNotification(application, "rejected");
-        });
-
-        holder.shortlistButton.setOnClickListener(v -> {
-            updateApplicationStatus(application, "shortlisted");
-            sendNotification(application, "shortlisted");
-        });
-    }
-
-    private void updateApplicationStatus(JobApplication application, String newStatus) {
-        firestore.collection("applications")
-                .document(application.getApplicationId())
-                .update(
-                        "status", newStatus,
-                        "updatedAt", new Timestamp(new Date())
-                )
-                .addOnSuccessListener(aVoid -> {
-                    application.setStatus(newStatus);
-                    notifyDataSetChanged();
-                });
-    }
-
-    private void sendNotification(JobApplication application, String status) {
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("userId", application.getStudentId());
-        notification.put("title", context.getString(com.example.newgemini.R.string.application_update));
-        notification.put("message", getNotificationMessage(status, application.getJobTitle()));
-        notification.put("timestamp", new Timestamp(new Date()));
-        notification.put("read", false);
-
-        firestore.collection("notifications").add(notification);
-    }
-
-    private String getNotificationMessage(String status, String jobTitle) {
-        switch (status.toLowerCase()) {
-            case "accepted":
-                return context.getString(com.example.newgemini.R.string.application_accepted, jobTitle);
-            case "rejected":
-                return context.getString(com.example.newgemini.R.string.application_rejected, jobTitle);
-            case "shortlisted":
-                return context.getString(com.example.newgemini.R.string.application_shortlisted, jobTitle);
-            default:
-                return context.getString(com.example.newgemini.R.string.application_status_updated, jobTitle);
+            holder.acceptButton.setVisibility(View.GONE);
+            holder.rejectButton.setVisibility(View.GONE);
         }
     }
 
@@ -148,34 +62,22 @@ public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapte
         return applications.size();
     }
 
-    public void updateApplications(List<JobApplication> newApplications) {
-        this.applications.clear();
-        this.applications.addAll(newApplications);
-        notifyDataSetChanged();
+    public static class ApplicationViewHolder extends RecyclerView.ViewHolder {
+        TextView jobTitle, status;
+        Button acceptButton, rejectButton;
+
+        public ApplicationViewHolder(@NonNull View itemView) {
+            super(itemView);
+            jobTitle = itemView.findViewById(R.id.jobTitle);
+            status = itemView.findViewById(R.id.status);
+            acceptButton = itemView.findViewById(R.id.acceptButton);
+            rejectButton = itemView.findViewById(R.id.rejectButton);
+        }
     }
 
-    static class ApplicationViewHolder extends RecyclerView.ViewHolder {
-        final TextView jobTitleText;
-        final TextView companyNameText;
-        final TextView statusText;
-        final TextView dateAppliedText;
-        final TextView studentNameText;
-        final View responseButtons;
-        final Button acceptButton;
-        final Button rejectButton;
-        final Button shortlistButton;
+    public interface OnApplicationActionListener {
+        void onAccept(Application application);
 
-        ApplicationViewHolder(@NonNull View itemView) {
-            super(itemView);
-            jobTitleText = itemView.findViewById(com.example.newgemini.R.id.jobTitleText);
-            companyNameText = itemView.findViewById(com.example.newgemini.R.id.companyNameText);
-            statusText = itemView.findViewById(com.example.newgemini.R.id.statusText);
-            dateAppliedText = itemView.findViewById(com.example.newgemini.R.id.dateAppliedText);
-            studentNameText = itemView.findViewById(com.example.newgemini.R.id.studentNameText);
-            responseButtons = itemView.findViewById(com.example.newgemini.R.id.responseButtons);
-            acceptButton = itemView.findViewById(com.example.newgemini.R.id.acceptButton);
-            rejectButton = itemView.findViewById(com.example.newgemini.R.id.rejectButton);
-            shortlistButton = itemView.findViewById(com.example.newgemini.R.id.shortlistButton);
-        }
+        void onReject(Application application);
     }
 }

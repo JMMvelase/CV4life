@@ -44,8 +44,7 @@ public class GeminiPro {
         // Access your API key as a Build Configuration variable
         String apiKey = BuildConfig.apiKey;
 
-        SafetySetting harassmentSafety = new SafetySetting(HarmCategory.HARASSMENT,
-                BlockThreshold.ONLY_HIGH);
+
 
         GenerationConfig.Builder configBuilder = new GenerationConfig.Builder();
         configBuilder.temperature = 0.9f;
@@ -56,8 +55,8 @@ public class GeminiPro {
         GenerativeModel gm = new GenerativeModel(
                 "gemini-2.0-flash",
                 apiKey,
-                generationConfig,
-                Collections.singletonList(harassmentSafety)
+                generationConfig
+
         );
 
         return GenerativeModelFutures.from(gm);

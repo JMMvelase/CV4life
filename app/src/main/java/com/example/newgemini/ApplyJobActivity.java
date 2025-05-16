@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.Timestamp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,10 +59,8 @@ public class ApplyJobActivity extends AppCompatActivity {
         uploadCvButton = findViewById(R.id.uploadCvButton);
         submitApplicationButton = findViewById(R.id.submitApplicationButton);
 
-        // Upload CV button click
+        // Set up button listeners
         uploadCvButton.setOnClickListener(v -> openFileChooser());
-
-        // Submit application button click
         submitApplicationButton.setOnClickListener(v -> submitApplication());
     }
 
@@ -78,14 +77,16 @@ public class ApplyJobActivity extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             Uri imageUri = data.getData();
-
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                 cvImageView.setImageBitmap(bitmap);
                 base64Cv = encodeImageToBase64(bitmap);
             } catch (IOException e) {
+                Toast.makeText(this, "Error loading image. Please try again.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
+        } else {
+            Toast.makeText(this, "No file selected.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -97,15 +98,27 @@ public class ApplyJobActivity extends AppCompatActivity {
     }
 
     private void submitApplication() {
-        String coverLetter = coverLetterEditText.getText().toString();
+        String coverLetter = coverLetterEditText.getText().toString().trim();
+
+        // Validate inputs
+        if (coverLetter.isEmpty()) {
+            Toast.makeText(this, "Please provide a cover letter.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (base64Cv == null || base64Cv.isEmpty()) {
             Toast.makeText(this, "Please upload your CV.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String studentId = auth.getCurrentUser().getUid();
+        String studentId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
 
+        if (studentId == null) {
+            Toast.makeText(this, "User not authenticated. Please log in again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create application data
         Map<String, Object> application = new HashMap<>();
         application.put("jobId", jobId);
         application.put("recruiterId", recruiterId);
@@ -113,13 +126,18 @@ public class ApplyJobActivity extends AppCompatActivity {
         application.put("coverLetter", coverLetter);
         application.put("cvBase64", base64Cv);
         application.put("status", "Pending");
+        application.put("createdAt", Timestamp.now()); // Add timestamp for sorting/filtering
 
+        // Submit to Firestore
         firestore.collection("applications")
                 .add(application)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Application submitted successfully!", Toast.LENGTH_SHORT).show();
-                    finish();
+                    finish(); // Close the activity
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to submit application: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to submit application: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                });
     }
 }
