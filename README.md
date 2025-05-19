@@ -1,71 +1,102 @@
-1. User Authentication & Roles
-Firebase Authentication is used to manage user sign‑up, sign‑in, and sign‑out.
+# App Overview: Student–Recruiter Marketplace
 
-Once signed in, each user is classified as either a Student or a Recruiter, and the app directs them to the corresponding dashboard (StudentDashboardActivity or RecruiterDashboardActivity).
+This mobile application connects students seeking jobs or internships with recruiters posting opportunities. Built on Firebase Authentication and Firestore, it offers essential features for both job-seekers and recruiters.
 
-2. Student (Job‑Seeker) Features
-a. Browse & Apply for Jobs
-View Available Jobs: Opens a list of all “open” job postings (JobsActivity).
+---
 
-My Applications: Lets students see which jobs they’ve applied for (ApplicationsActivity).
+## 1. User Authentication & Roles
 
-b. Profile & CV Management
-Edit CV: A built‑in editor (CVEditorActivity) where students can build or tweak their résumé.
+- **Authentication:**  
+  Users register and sign in using Firebase Authentication.  
+- **Role Assignment:**  
+  Upon authentication, each user is designated as either a **Student (Job-Seeker)** or a **Recruiter (Job-Poster)**.
+- **Dashboard Routing:**  
+  Depending on their role, users are directed to:
+    - `StudentDashboardActivity` (for Students)
+    - `RecruiterDashboardActivity` (for Recruiters)
 
-Edit Profile: Manage personal details (name, contact info, photo) in ProfileActivity.
+---
 
-c. Chatbot Assistance
-Chatbot: Launches a chat interface (viviActivity)—could be a helper that answers FAQs, suggests jobs, or walks students through the application process.
+## 2. Student (Job-Seeker) Features
 
-d. Settings & Logout
-Settings: Adjust app preferences (notifications, privacy, theme) via SettingsActivity.
+### a. Job Browsing & Application
+- **View Available Jobs:**  
+  Access all active job postings via `JobsActivity`.
+- **My Applications:**  
+  Review jobs you have applied for in `ApplicationsActivity`.
 
-Logout: Signs out and clears the navigation stack, sending the user back to LoginActivity.
+### b. Profile & CV Management
+- **Edit CV:**  
+  Use `CVEditorActivity` for in-app résumé building and editing.
+- **Edit Profile:**  
+  Update personal details (name, contact info, photo) in `ProfileActivity`.
 
-3. Recruiter (Job‑Poster) Features
-a. Post New Jobs
-Post Job Dialog: A pop‑up form (dialog_post_job.xml) where recruiters enter:
+### c. Chatbot Assistance
+- **Chatbot:**  
+  Launches `viviActivity`—an AI assistant for FAQs, job suggestions, and application guidance.
 
-Job title, description, requirements
+### d. Settings & Logout
+- **Settings:**  
+  Customize preferences (notifications, privacy, theme) via `SettingsActivity`.
+- **Logout:**  
+  Securely signs out and returns to `LoginActivity`, clearing navigation history.
 
-Select a sector from a dropdown
+---
 
-On submission, the job is saved to Firestore with fields like recruiterId, createdAt, and status: "open".
+## 3. Recruiter (Job-Poster) Features
 
-b. Manage Applications
-View Applications: Opens ViewApplicationsActivity, showing candidates who’ve applied to the recruiter’s postings.
+### a. Job Posting
+- **Post New Job:**  
+  Open a dialog (`dialog_post_job.xml`) to enter:
+    - Job title, description, requirements
+    - Select sector from a dropdown
+  On submission, the job is saved to Firestore with `recruiterId`, `createdAt`, and `status: "open"`.
 
-c. Profile Management
-Edit Profile: (Placeholder) would allow recruiters to manage company details, logos, contact info, etc.
+### b. Application Management
+- **View Candidate Applications:**  
+  Use `ViewApplicationsActivity` to see all applicants for your posted jobs.
 
-d. Logout
-Exactly the same sign‑out logic as the student side: clear session, clear backstack, return to login.
+### c. Profile Management
+- **Edit Profile:**  
+  (Planned) Manage company information, logos, and contact details.
 
-4. Data & Persistence
-Firestore Schema (implied):
+### d. Logout
+- **Logout:**  
+  Identical sign-out flow as students, clearing session and returning to login.
 
-jobs collection
+---
 
-Documents with fields: title, description, requirements, sector, recruiterId, createdAt, status
+## 4. Data & Persistence
 
-applications collection (accessed in ApplicationsActivity/ViewApplicationsActivity)
+- **Firestore Structure:**
+  - **`jobs` Collection:**  
+    Each document contains fields like `title`, `description`, `requirements`, `sector`, `recruiterId`, `createdAt`, `status`.
+  - **`applications` Collection:**  
+    Stores relationships between jobs and applicants, with fields such as `jobId`, `studentId`, `applicationDate`, and `status`.
 
-Likely stores links between jobId, studentId, application date, and maybe application status.
+- **Real-Time Updates:**  
+  UI reflects changes instantly thanks to Firestore’s real-time syncing.
 
-Real‑Time Updates: Using Firestore means any changes (new posts, new applications) can reflect immediately in the UI.
+---
 
-5. UX Flow
-Login / Sign‑Up → FirebaseAuth
+## 5. User Experience Flow
 
-Role Check → Launch Student vs. Recruiter Dashboard
+1. **Login / Sign-Up:**  
+   Authenticate via Firebase.
+2. **Role Check:**  
+   Determine user type and launch the appropriate dashboard.
+3. **Dashboard Navigation:**  
+   Access job browsing, posting, profile management, or chatbot.
+4. **Dialogs & Editors:**  
+   Use in-app forms for data creation and updates.
+5. **Data Sync:**  
+   All job and application data is powered by Firestore reads/writes.
+6. **Logout:**  
+   Safely sign out and return to login.
 
-Dashboard Cards → Navigate to specific tasks (browse, post, edit, chat)
+---
 
-Dialogs & Editors → In‑app forms for creating or updating data
+## 6. Summary
 
-Data Saves → Firestore reads/writes power dynamic lists of jobs and applications
-
-Logout → Safe sign‑out and return to login screen
-
-In Short
-This is a two‑sided marketplace mobile app, matching students looking for work or internships with recruiters posting opportunities. It provides all the essential features: authentication, job browsing and posting, application tracking, in‑app résumé/profile editing, and a chatbot for assistance—all backed by Firebase’s Authentication and Firestore services.
+This two-sided mobile marketplace streamlines matching students and recruiters.  
+It supports authentication, dynamic job browsing/posting, application tracking, in-app profile/CV management, and chatbot assistance—all backed by Firebase's robust services.
