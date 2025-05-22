@@ -1,65 +1,88 @@
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="8dp"
-    android:foreground="?attr/selectableItemBackground">
+    android:elevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="681dp"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@color/colorSecondary">
+        android:padding="16dp">
 
-        <!-- Job Title -->
         <TextView
             android:id="@+id/jobTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Job Title"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:paddingBottom="8dp" />
+            android:textStyle="bold" />
 
-        <!-- Status -->
         <TextView
             android:id="@+id/status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Status: Pending"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:paddingBottom="12dp" />
-
-        <!-- Action Buttons (For Recruiters) -->
-        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:layout_marginTop="4dp"
+            android:text="Status"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/applicantName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Applicant Name"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/applicantEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Applicant Email"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/coverLetter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FF000000"
+            android:padding="8dp"
+            android:text="Cover Letter"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/cvImageView"
+            android:layout_width="360dp"
+            android:layout_height="447dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="Applicant CV Image"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/acceptButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Accept"
-                android:backgroundTint="@color/green"
-                android:textColor="@android:color/white"
-                android:layout_marginEnd="8dp" />
+                android:layout_weight="1"
+                android:text="Accept" />
 
             <Button
                 android:id="@+id/rejectButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Reject"
-                android:backgroundTint="@color/red"
-                android:textColor="@android:color/white" />
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Reject" />
         </LinearLayout>
-
     </LinearLayout>
 </androidx.cardview.widget.CardView>

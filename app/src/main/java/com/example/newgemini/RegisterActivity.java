@@ -20,11 +20,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -37,6 +38,10 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private CardView registerCard;
     private LinearLayout formContainer;
+
+    // Allowed email pattern: only gmail.com or dut4life.ac.za
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9._%+-]+@(gmail\\.com|dut4life\\.ac\\.za)$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +88,13 @@ public class RegisterActivity extends AppCompatActivity {
         String role = selectedRadioButton.getText().toString();
 
         if (!validateInputs(email, password)) {
+            return;
+        }
+
+        // Restrict email domains
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            emailInput.setError("Only gmail.com or dut4life.ac.za emails allowed");
+            emailInput.requestFocus();
             return;
         }
 

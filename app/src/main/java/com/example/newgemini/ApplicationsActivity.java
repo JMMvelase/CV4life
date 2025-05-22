@@ -1,5 +1,8 @@
 package com.example.newgemini;
 
+import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,29 +39,20 @@ public class ApplicationsActivity extends AppCompatActivity implements Applicati
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_applications);
 
-        // Initialize Firestore and FirebaseAuth
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Determine if the user is a recruiter
         FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
-            isRecruiter = user.getUid().startsWith("recruiter_");
-        } else {
-            isRecruiter = false;
-        }
+        isRecruiter = user != null && user.getUid().startsWith("recruiter_");
 
-        // Initialize UI components
         applicationsRecyclerView = findViewById(R.id.applicationsRecyclerView);
         noApplicationsTextView = findViewById(R.id.noApplicationsTextView);
 
-        // Set up RecyclerView
         applicationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         applicationList = new ArrayList<>();
         applicationsAdapter = new ApplicationsAdapter(this, applicationList, isRecruiter, this);
         applicationsRecyclerView.setAdapter(applicationsAdapter);
 
-        // Fetch applications based on the user's role
         fetchApplications();
     }
 
@@ -89,7 +83,7 @@ public class ApplicationsActivity extends AppCompatActivity implements Applicati
                         for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                             Application application = doc.toObject(Application.class);
                             if (application != null) {
-                                application.setId(doc.getId()); // Ensure the ID is set
+                                application.setId(doc.getId());
                                 applicationList.add(application);
                             }
                         }
@@ -117,7 +111,16 @@ public class ApplicationsActivity extends AppCompatActivity implements Applicati
 
     @Override
     public void onAccept(Application application) {
-        updateApplicationStatus(application, "Accepted", null);
+        // HARDCODE EMAIL INTENT, NOTHING ELSE
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setData(Uri.parse("mailto:someone@example.com"));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Test Subject");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Test Body");
+        try {
+            startActivity(emailIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "No email clients installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -125,9 +128,56 @@ public class ApplicationsActivity extends AppCompatActivity implements Applicati
         showFeedbackDialog(application);
     }
 
+    private void showFeedbackDialog(Application application) {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_feedback);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        android.widget.EditText feedbackInput = dialog.findViewById(R.id.feedbackInput);
+        android.widget.Button submitButton = dialog.findViewById(R.id.submitFeedbackButton);
+        android.widget.Button cancelButton = dialog.findViewById(R.id.cancelFeedbackButton);
+
+        submitButton.setOnClickListener(v -> {
+            String feedback = feedbackInput.getText().toString().trim();
+            if (feedback.isEmpty()) {
+                Toast.makeText(this, "Please provide feedback.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            testLaunchEmailIntent(application, "Rejected", feedback);
+            dialog.dismiss();
+        });
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    // Forcefully opens email intent before updating Firestore
+    private void testLaunchEmailIntent(Application application, String rejected, String feedback) {
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setData(Uri.parse("mailto:someone@example.com"));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Test Subject");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Test Body");
+        try {
+            startActivity(emailIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "No email clients installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchEmailIntent(String recipientEmail, String subject, String body) {
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setData(Uri.parse("mailto:" + recipientEmail));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+        try {
+            startActivity(emailIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "No email clients installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void updateApplicationStatus(Application application, String status, String feedback) {
         String applicationId = application.getId();
-
         if (applicationId == null || applicationId.isEmpty()) {
             Toast.makeText(this, "Invalid application ID", Toast.LENGTH_SHORT).show();
             return;
@@ -148,28 +198,5 @@ public class ApplicationsActivity extends AppCompatActivity implements Applicati
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to update status: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-    }
-
-    private void showFeedbackDialog(Application application) {
-        final android.app.Dialog dialog = new android.app.Dialog(this);
-        dialog.setContentView(R.layout.dialog_feedback);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        android.widget.EditText feedbackInput = dialog.findViewById(R.id.feedbackInput);
-        android.widget.Button submitButton = dialog.findViewById(R.id.submitFeedbackButton);
-        android.widget.Button cancelButton = dialog.findViewById(R.id.cancelFeedbackButton);
-
-        submitButton.setOnClickListener(v -> {
-            String feedback = feedbackInput.getText().toString().trim();
-            if (feedback.isEmpty()) {
-                Toast.makeText(this, "Please provide feedback.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            updateApplicationStatus(application, "Rejected", feedback);
-            dialog.dismiss();
-        });
-
-        cancelButton.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
     }
 }

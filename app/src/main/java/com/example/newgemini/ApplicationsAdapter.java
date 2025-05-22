@@ -1,11 +1,14 @@
 package com.example.newgemini;
 
 import android.content.Context;
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,7 +31,7 @@ public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapte
         this.applications = applications;
         this.isRecruiter = isRecruiter;
         this.actionListener = actionListener;
-        this.firestore = FirebaseFirestore.getInstance(); // Initialize Firestore
+        this.firestore = FirebaseFirestore.getInstance();
     }
 
     @NonNull
@@ -44,44 +47,107 @@ public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapte
 
         // Fetch the job title from Firestore dynamically if not available
         if (application.getTitle() == null || application.getTitle().isEmpty()) {
-            Log.d("ApplicationsAdapter", "Fetching title for recruiterId: " + application.getRecruiterId());
             firestore.collection("jobs")
                     .whereEqualTo("recruiterId", application.getRecruiterId())
-                    .limit(1) // Assuming each recruiter has one job or fetching the first job
+                    .limit(1)
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         if (!queryDocumentSnapshots.isEmpty()) {
                             String jobTitle = queryDocumentSnapshots.getDocuments().get(0).getString("title");
-                            application.setTitle(jobTitle); // Update the Application object
-                            holder.jobTitle.setText(jobTitle); // Bind the fetched title to the TextView
+                            application.setTitle(jobTitle);
+                            holder.jobTitle.setText(jobTitle);
                         } else {
                             holder.jobTitle.setText("No Title Available");
-                            Log.e("ApplicationsAdapter", "No job found for recruiterId: " + application.getRecruiterId());
                         }
                     })
-                    .addOnFailureListener(e -> {
-                        holder.jobTitle.setText("Error Fetching Title");
-                        Log.e("ApplicationsAdapter", "Failed to fetch job title: " + e.getMessage());
-                    });
+                    .addOnFailureListener(e -> holder.jobTitle.setText("Error Fetching Title"));
         } else {
-            // If title is already available, bind it directly
             holder.jobTitle.setText(application.getTitle());
         }
 
-        // Bind the application status to the status TextView
         holder.status.setText(application.getStatus());
 
-        // Show Accept and Reject buttons for recruiters
         if (isRecruiter) {
+            // Show Accept and Reject buttons
             holder.acceptButton.setVisibility(View.VISIBLE);
             holder.rejectButton.setVisibility(View.VISIBLE);
 
             holder.acceptButton.setOnClickListener(v -> actionListener.onAccept(application));
             holder.rejectButton.setOnClickListener(v -> actionListener.onReject(application));
+
+            // Show cover letter
+            holder.coverLetter.setVisibility(View.VISIBLE);
+            holder.coverLetter.setText(
+                    application.getCoverLetter() != null ? application.getCoverLetter() : "No cover letter"
+            );
+
+            // Show CV image
+            holder.cvImageView.setVisibility(View.VISIBLE);
+            if (application.getCvBase64() != null && !application.getCvBase64().isEmpty()) {
+                try {
+                    byte[] decodedString = Base64.decode(application.getCvBase64(), Base64.DEFAULT);
+                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    holder.cvImageView.setImageBitmap(decodedByte);
+                } catch (Exception e) {
+                    holder.cvImageView.setImageResource(android.R.color.darker_gray);
+                }
+            } else {
+                holder.cvImageView.setImageResource(android.R.color.darker_gray);
+            }
+
+            // Fetch student details
+            holder.applicantName.setVisibility(View.VISIBLE);
+            holder.applicantEmail.setVisibility(View.VISIBLE);
+
+            String studentId = application.getStudentId();
+            if (studentId != null) {
+                firestore.collection("students").document(studentId)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String name = documentSnapshot.getString("name");
+                                String email = documentSnapshot.getString("email");
+                                holder.applicantName.setText(name != null ? name : " ");
+                                holder.applicantEmail.setText(email != null ? email : " ");
+                            } else {
+                                holder.applicantName.setText(" ");
+                                holder.applicantEmail.setText(" ");
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            holder.applicantName.setText("Error");
+                            holder.applicantEmail.setText("Error");
+                        });
+            } else {
+                holder.applicantName.setText(" ");
+                holder.applicantEmail.setText(" ");
+            }
         } else {
-            // Hide buttons for students
+            // Hide recruiter-only views
             holder.acceptButton.setVisibility(View.GONE);
             holder.rejectButton.setVisibility(View.GONE);
+            holder.applicantName.setVisibility(View.GONE);
+            holder.applicantEmail.setVisibility(View.GONE);
+
+            // Show cover letter to student
+            holder.coverLetter.setVisibility(View.VISIBLE);
+            holder.coverLetter.setText(
+                    application.getCoverLetter() != null ? application.getCoverLetter() : "No cover letter"
+            );
+
+            // Show CV to student
+            holder.cvImageView.setVisibility(View.VISIBLE);
+            if (application.getCvBase64() != null && !application.getCvBase64().isEmpty()) {
+                try {
+                    byte[] decodedString = Base64.decode(application.getCvBase64(), Base64.DEFAULT);
+                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    holder.cvImageView.setImageBitmap(decodedByte);
+                } catch (Exception e) {
+                    holder.cvImageView.setImageResource(android.R.color.darker_gray);
+                }
+            } else {
+                holder.cvImageView.setImageResource(android.R.color.darker_gray);
+            }
         }
     }
 
@@ -93,19 +159,24 @@ public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapte
     public static class ApplicationViewHolder extends RecyclerView.ViewHolder {
         TextView jobTitle, status;
         Button acceptButton, rejectButton;
+        TextView applicantName, applicantEmail, coverLetter;
+        ImageView cvImageView;
 
         public ApplicationViewHolder(@NonNull View itemView) {
             super(itemView);
-            jobTitle = itemView.findViewById(R.id.jobTitle); // Ensure this matches the ID in the XML
+            jobTitle = itemView.findViewById(R.id.jobTitle);
             status = itemView.findViewById(R.id.status);
             acceptButton = itemView.findViewById(R.id.acceptButton);
             rejectButton = itemView.findViewById(R.id.rejectButton);
+            applicantName = itemView.findViewById(R.id.applicantName);
+            applicantEmail = itemView.findViewById(R.id.applicantEmail);
+            coverLetter = itemView.findViewById(R.id.coverLetter);
+            cvImageView = itemView.findViewById(R.id.cvImageView);
         }
     }
 
     public interface OnApplicationActionListener {
         void onAccept(Application application);
-
         void onReject(Application application);
     }
 }

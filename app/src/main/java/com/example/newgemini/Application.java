@@ -10,10 +10,11 @@ public class Application {
     private String studentId;
     private String status;
     private Date createdAt;
-
-    // These fields might exist in Firestore but are not needed in the app
     private transient String cvBase64;
     private transient String coverLetter;
+
+    // These fields might exist in Firestore but are not needed in the app
+
 
     // Default constructor required for Firestore
     public Application() {}
@@ -66,6 +67,11 @@ public class Application {
     public void setStatus(String status) {
         this.status = status;
     }
+    public String getCvBase64() { return cvBase64; }
+    public void setCvBase64(String cvBase64) { this.cvBase64 = cvBase64; }
+
+    public String getCoverLetter() { return coverLetter; }
+    public void setCoverLetter(String coverLetter) { this.coverLetter = coverLetter; }
 
     public Date getCreatedAt() {
         return createdAt;

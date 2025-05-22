@@ -18,6 +18,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.regex.Pattern;
+
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText emailInput, passwordInput;
@@ -28,6 +30,10 @@ public class LoginActivity extends AppCompatActivity {
     private CardView loginCard;
     private ImageView logoImage;
     private TextView welcomeText;
+
+    // Allowed email pattern: only gmail.com or dut4life.ac.za
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9._%+-]+@(gmail\\.com|dut4life\\.ac\\.za)$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,13 @@ public class LoginActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(email)) {
             emailInput.setError("Email is required");
+            return;
+        }
+
+        // Restrict email domains
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            emailInput.setError("Only gmail.com or dut4life.ac.za emails allowed");
+            emailInput.requestFocus();
             return;
         }
 

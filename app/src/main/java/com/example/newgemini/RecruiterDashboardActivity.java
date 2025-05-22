@@ -31,24 +31,23 @@ public class RecruiterDashboardActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         CardView postJobCard = findViewById(R.id.postJobCard);
+        CardView analyticsCard = findViewById(R.id.analyticsCard);
+        CardView viewJobsCard = findViewById(R.id.viewJobsCard);
         CardView viewApplicationsCard = findViewById(R.id.viewApplicationsCard);
-        CardView profileCard = findViewById(R.id.profileCard);
 
         postJobCard.setOnClickListener(v -> showJobPostDialog());
+        analyticsCard.setOnClickListener(v -> startActivity(new Intent(this, AnalyticsActivity.class)));
+        viewJobsCard.setOnClickListener(v -> startActivity(new Intent(this, ViewJobsPostedActivity.class)));
         viewApplicationsCard.setOnClickListener(v -> viewApplications());
-        profileCard.setOnClickListener(v -> editProfile());
 
         Button btnLogout = findViewById(R.id.btnLogout);
-
-        // Set Logout Button Click Listener
         btnLogout.setOnClickListener(v -> {
-            auth.signOut(); // Log the user out
+            auth.signOut();
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish(); // Close the activity
+            finish();
         });
-
     }
 
     private void showJobPostDialog() {
@@ -66,13 +65,10 @@ public class RecruiterDashboardActivity extends AppCompatActivity {
         Button postButton = dialog.findViewById(R.id.postJobButton);
         Button cancelButton = dialog.findViewById(R.id.cancelButton);
 
-        // Set up the spinner with job sectors
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.job_sectors, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sectorSpinner.setAdapter(adapter);
-
-
 
         postButton.setOnClickListener(v -> {
             String title = titleInput.getText().toString().trim();
@@ -112,9 +108,5 @@ public class RecruiterDashboardActivity extends AppCompatActivity {
 
     private void viewApplications() {
         startActivity(new Intent(this, ViewApplicationsActivity.class));
-    }
-
-    private void editProfile() {
-        // Implementation for profile editing
     }
 }

@@ -24,7 +24,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         // Find views by ID
         CardView viewJobsCard = findViewById(R.id.viewJobsCard);
         CardView myApplicationsCard = findViewById(R.id.myApplicationsCard);
-        CardView editCVCard = findViewById(R.id.editCVCard);
+
         CardView profileCard = findViewById(R.id.profileCard);
         CardView chatbotCard = findViewById(R.id.chatbotCard);
         CardView settingsCard = findViewById(R.id.settingsCard);
@@ -33,7 +33,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         // Set onClickListeners
         viewJobsCard.setOnClickListener(v -> viewAvailableJobs());
         myApplicationsCard.setOnClickListener(v -> viewMyApplications());
-        editCVCard.setOnClickListener(v -> editCV());
+
         profileCard.setOnClickListener(v -> editProfile());
         settingsCard.setOnClickListener(v -> openSettings());
         chatbotCard.setOnClickListener(v -> openChatbot());
@@ -52,11 +52,6 @@ public class StudentDashboardActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void editCV() {
-        // Navigate to CV editor
-        Intent intent = new Intent(this, CVEditorActivity.class);
-        startActivity(intent);
-    }
 
     private void editProfile() {
         Intent intent = new Intent(this, ProfileActivity.class);

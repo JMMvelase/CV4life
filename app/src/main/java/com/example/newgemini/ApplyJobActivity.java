@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -24,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 public class ApplyJobActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -32,6 +32,7 @@ public class ApplyJobActivity extends AppCompatActivity {
     private EditText coverLetterEditText;
     private ImageView cvImageView;
     private Button uploadCvButton, submitApplicationButton;
+    private ProgressBar progressBar;                   // NEW
 
     private String jobId;
     private String recruiterId;
@@ -45,23 +46,28 @@ public class ApplyJobActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_apply_job);
 
-        // Initialize Firestore and FirebaseAuth
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Get job details from intent
         jobId = getIntent().getStringExtra("jobId");
         recruiterId = getIntent().getStringExtra("recruiterId");
 
-        // Initialize views
-        coverLetterEditText = findViewById(R.id.coverLetterEditText);
-        cvImageView = findViewById(R.id.cvImageView);
-        uploadCvButton = findViewById(R.id.uploadCvButton);
+        coverLetterEditText  = findViewById(R.id.coverLetterEditText);
+        cvImageView          = findViewById(R.id.cvImageView);
+        uploadCvButton       = findViewById(R.id.uploadCvButton);
         submitApplicationButton = findViewById(R.id.submitApplicationButton);
+        progressBar          = findViewById(R.id.progressBar);        // NEW
 
-        // Set up button listeners
         uploadCvButton.setOnClickListener(v -> openFileChooser());
         submitApplicationButton.setOnClickListener(v -> submitApplication());
+    }
+
+    /** Convenience helper to flip the UI into / out of "loading" mode */
+    private void setLoading(boolean loading) {
+        progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+        uploadCvButton.setEnabled(!loading);
+        submitApplicationButton.setEnabled(!loading);
+        coverLetterEditText.setEnabled(!loading);
     }
 
     private void openFileChooser() {
@@ -75,7 +81,10 @@ public class ApplyJobActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK &&
+                data != null && data.getData() != null) {
+
+            setLoading(true);                              // show spinner while we work
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
@@ -85,7 +94,8 @@ public class ApplyJobActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error loading image. Please try again.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
-        } else {
+            setLoading(false);                             // hide when done
+        } else if (requestCode == PICK_IMAGE_REQUEST) {
             Toast.makeText(this, "No file selected.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -93,32 +103,27 @@ public class ApplyJobActivity extends AppCompatActivity {
     private String encodeImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        return Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
 
     private void submitApplication() {
         String coverLetter = coverLetterEditText.getText().toString().trim();
 
-        // Validate inputs
         if (coverLetter.isEmpty()) {
             Toast.makeText(this, "Please provide a cover letter.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (base64Cv == null || base64Cv.isEmpty()) {
             Toast.makeText(this, "Please upload your CV.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         String studentId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
-
         if (studentId == null) {
             Toast.makeText(this, "User not authenticated. Please log in again.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create application data
+        // Build application object
         Map<String, Object> application = new HashMap<>();
         application.put("jobId", jobId);
         application.put("recruiterId", recruiterId);
@@ -126,17 +131,19 @@ public class ApplyJobActivity extends AppCompatActivity {
         application.put("coverLetter", coverLetter);
         application.put("cvBase64", base64Cv);
         application.put("status", "Pending");
-        application.put("createdAt", Timestamp.now()); // Add timestamp for sorting/filtering
+        application.put("createdAt", Timestamp.now());
 
-        // Submit to Firestore
+        setLoading(true);                                    // SHOW spinner
         firestore.collection("applications")
                 .add(application)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Application submitted successfully!", Toast.LENGTH_SHORT).show();
-                    finish(); // Close the activity
+                    setLoading(false);                       // HIDE spinner
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to submit application: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    setLoading(false);                       // HIDE spinner
                     e.printStackTrace();
                 });
     }

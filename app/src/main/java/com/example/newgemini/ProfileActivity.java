@@ -52,6 +52,13 @@ public class ProfileActivity extends AppCompatActivity {
                 R.array.job_sectors, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         departmentSpinner.setAdapter(adapter);
+
+        // --- Show the logged-in user's email in the email input field, and make it read-only ---
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        emailInput.setText(userEmail);
+        emailInput.setEnabled(false); // Make the email field non-editable
+        emailInput.setFocusable(false); // Prevent keyboard popup
+        emailInput.setClickable(false);
     }
 
     private void loadProfileData() {
@@ -63,8 +70,10 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {
                         nameInput.setText(document.getString("name"));
-                        emailInput.setText(document.getString("email"));
                         phoneInput.setText(document.getString("phone"));
+
+                        // Email is now always read from FirebaseAuth, not Firestore
+                        // emailInput.setText(document.getString("email")); // REMOVE or COMMENT OUT
 
                         String department = document.getString("department");
                         if (department != null) {
@@ -85,7 +94,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         Map<String, Object> profile = new HashMap<>();
         profile.put("name", nameInput.getText().toString().trim());
-        profile.put("email", emailInput.getText().toString().trim());
+        // Always use the authenticated email
+        profile.put("email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
         profile.put("phone", phoneInput.getText().toString().trim());
         profile.put("department", departmentSpinner.getSelectedItem().toString());
 
