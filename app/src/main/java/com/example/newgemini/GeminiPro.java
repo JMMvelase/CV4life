@@ -1,6 +1,6 @@
-package com.example.newgemini;
+package com.example.newgemini; 
 
-import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.GenerativeModel; 
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.BlockThreshold;
