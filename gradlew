@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env s
 
 #
 # Copyright 2015 the original author or authors.
