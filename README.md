@@ -94,8 +94,6 @@ This mobile application connects students seeking jobs or internships with recru
 6. **Logout:**  
    Safely sign out and return to login.
 
----
-
 ## 6. Summary
 
 This two-sided mobile marketplace streamlines matching students and recruiters.  
